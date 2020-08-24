@@ -10,8 +10,117 @@ import (
 	"strings"
 )
 
+func frogJumpClient() {
+	var want, got int
+
+	// case 1
+	want = 3
+	got = frogJump(10, 85, 30)
+	// 10 + 30 * steps >= 85
+	// steps = ( 85 - 10 ) / 30 = 75/30 = 2. Here remainder is more than 1, so increase
+	fmt.Printf("1 g:%d	w:%d\n", got, want)
+	if got == want {
+		fmt.Println("1 Ok")
+	}
+
+	// case 2
+	want = 8
+	got = frogJump(5, 85, 10) // 5 + 10 * 8
+	fmt.Printf("2 g:%d	w:%d\n", got, want)
+	// 5 + 10 * steps >= 85
+	// steps = ( 85 - 5 ) / 10 = 80/10 = 8
+	if got == want {
+		fmt.Println("2 Ok")
+	}
+
+	// case 3 X==Y
+	want = 0
+	got = frogJump(85, 85, 30)
+	fmt.Printf("3 g:%d	w:%d\n", got, want)
+	if got == want {
+		fmt.Println("3 Ok")
+	}
+
+	// case 4
+	// Starting point is 0
+	want = 10
+	got = frogJump(0, 10, 1)
+	fmt.Printf("4 g:%d	w:%d\n", got, want)
+	if got == want {
+		fmt.Println("4 Ok")
+	}
+
+	// case 5
+	// Jump == Step
+	want = 1
+	got = frogJump(1, 10, 10)
+	fmt.Printf("5 g:%d	w:%d\n", got, want)
+	if got == want {
+		fmt.Println("5 Ok")
+	}
+
+}
+
+// Write a function:
+// func Solution(X int, Y int, D int) int
+// that, given three integers X, Y and D,
+// returns the minimal number of jumps D from
+// position X to a position equal to or greater
+// than Y.
+// https://app.codility.com/programmers/lessons/3-time_complexity/frog_jmp
+func frogJump(X int, Y int, D int) int {
+
+	if X == Y {
+		return 0
+	}
+
+	if Y == X+D {
+		return 1
+	}
+
+	mod := (Y - X) % D
+	remainder := (Y - X) / D
+
+	if mod > 0 {
+		remainder++
+	}
+
+	return remainder
+}
+
+// Condition:
+// Each element of the array can be paired with
+// another element that has the same value, except
+// for one element that is left unpaired.
+// Write a function given an array A consisting of N integers
+// returns value of the unpaired elements.
+// func Solution(A []int) int
+
+// This is straight forward so will not be solving now
+func oddOccurances(A []int) int {
+	// Sort A
+	// Count values: total odd element t = 0
+	// loop range A:
+	// element count e = 1
+	// if current value is same as previous: increment e
+	// else:
+	//   check if e is odd: if true then increment t, set e to 1
+	// return t
+
+	return 0
+}
+
 // Solution scores 100% in Codility Arrays CyclicRotation
 // Time O(n), space O(1)
+// Resources:
+// https://leetcode.com/problems/rotate-array/discuss/806176/20ms-in-C-with-Time-O(n)-space-O(1)-accepted-solution
+// https://www.geeksforgeeks.org/reversal-algorithm-right-rotation-array
+// https://www.techiedelight.com/right-rotate-an-array-k-times
+// https://solution.programmingoneonone.com/2020/07/hackerrank-arrays-left-rotation-solution.html
+// https://www.javatpoint.com/java-program-to-right-rotate-the-elements-of-an-array
+// https://www.geeksforgeeks.org/python-program-for-program-for-array-rotation-2
+// https://www.geeksforgeeks.org/reversal-algorithm-right-rotation-array
+// https://stackoverflow.com/questions/21322173/convert-rune-to-int
 func cyclicRotation(nums []int, k int) []int {
 	numsSize := len(nums)
 
@@ -64,7 +173,7 @@ func cyclicRotationClient() {
 	A := []int{3, 8}
 	K := 5
 
-	rotateArray(A, K)
+	cyclicRotation(A, K)
 	fmt.Println(A)
 
 	// brute force ; need more math on this
