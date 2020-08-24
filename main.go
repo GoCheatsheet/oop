@@ -11,34 +11,35 @@ import (
 )
 
 func main() {
-	var testcase, want, got int
+	var testcase string
+	var want, got int
 	var A []int
 
-	testcase = 1
+	testcase = "1"
 	A = []int{1, 3, 1, 4, 2, 4, 5, 4}
 	want = 6
 	got = frogRiverOne(5, A)
 	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
 
-	testcase = 2 // Leaf falling at where the frog is
+	testcase = "2" // Leaf falling at where the frog is
 	A = []int{2, 2, 2, 2, 2}
 	want = -1
 	got = frogRiverOne(2, A)
 	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
 
-	testcase = 3
+	testcase = "3"
 	A = []int{1, 2}
 	want = 1
 	got = frogRiverOne(2, A)
 	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
 
-	testcase = 4
+	testcase = "4"
 	A = []int{5, 1, 2, 1, 4, 2, 4, 5, 3}
 	want = 8
 	got = frogRiverOne(3, A)
 	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
 
-	testcase = 5
+	testcase = "5 Sequential"
 	A = []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 11}
 	want = 11
 	got = frogRiverOne(11, A)
@@ -46,11 +47,30 @@ func main() {
 
 	// in this case, the remaining steps were found after
 	// the position the frog was at.
-	// testcase = 6
+	testcase = "6"
 	A = []int{1, 3, 1, 3, 2, 1, 3}
 	want = 4
 	got = frogRiverOne(3, A)
 	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+
+	testcase = "7 Single" // 1 element
+	A = []int{5}
+	want = 0
+	got = frogRiverOne(5, A)
+	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+
+	testcase = "8 Frog never crosses the river"
+	A = []int{1, 3, 1, 10, 6, 5, 10, 21, 4, 5, 9, 6, 7}
+	want = -1
+	got = frogRiverOne(10, A)
+	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+
+	testcase = "9 Wrong single element "
+	A = []int{1}
+	want = -1
+	got = frogRiverOne(2, A)
+	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+
 }
 
 // You are given an array A consisting of N integers
@@ -64,7 +84,7 @@ func main() {
 
 // Objective: Pass performace tests.
 
-// Another Logic
+// Algorithm
 // copy the value of A to a new array to preserve the index order
 // sort A
 //
@@ -72,12 +92,13 @@ func main() {
 // while checking create a map: This might not be required!
 //
 // if sequence is continuous:
-// 		search the first occuring index of all values till X
-// 		add to map
+// 		all the values must occur
 //
+// add to map
 // return the highest value of key in the map
 
-// This logic is also complicated. Time and Space contraints are high.
+// Solution scores 100% in Codility Arrays CyclicRotation
+// Detected time complexity: O(N)
 
 func frogRiverOne(X int, A []int) int {
 	maxIndex := -1
@@ -85,34 +106,50 @@ func frogRiverOne(X int, A []int) int {
 	var magicArr [100000]int
 	lenA := len(A)
 
+	if lenA == 1 && A[0] == X {
+		return 0
+	}
+
+	if lenA == 1 && A[0] != X {
+		return -1
+	}
+
 	copy(magicArr[:], A)
 	cpA := magicArr[:lenA]
 	sort.Ints(cpA)
 
-	if cpA[0] == cpA[lenA-1] {
+	if cpA[0] > 1 || cpA[0] == cpA[lenA-1] {
 		return maxIndex
 	}
 
-	for k, v := range cpA[:lenA-1] {
-
-		if v > cpA[k+1] {
-			return maxIndex
-		}
-	}
-
 	stepMap := make(map[int]int)
-	for k, v := range A {
+	sumOfStepMapKeys := 0
 
-		if _, ok := stepMap[v]; !ok && v <= X {
-			stepMap[v] = k
+	for kA, vA := range A {
 
-			if maxIndex < k {
-				maxIndex = k
+		if _, ok := stepMap[vA]; !ok && vA <= X {
+			stepMap[vA] = kA
+
+			if maxIndex < kA {
+				maxIndex = kA
 			}
+			sumOfStepMapKeys += vA
+
+			// fmt.Printf("k:sum %v:%v\n", v, sumOfStepMapKeys)
 		}
 	}
 
-	return maxIndex
+	// fmt.Println()
+
+	// fmt.Printf("X %v Map %v\n", X, stepMap)
+
+	sumOfSequentialNum := (X * (X + 1)) / 2
+	// fmt.Printf("Sum Seq %d : Map %d\n", sumOfSequentialNum, sumOfStepMapKeys)
+	if sumOfSequentialNum == sumOfStepMapKeys {
+		return maxIndex
+	}
+
+	return -1
 }
 
 // The solution passes all example tests
