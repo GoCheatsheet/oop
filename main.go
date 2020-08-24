@@ -10,6 +10,233 @@ import (
 	"strings"
 )
 
+func main() {
+	var testcase, want, got int
+	var A []int
+
+	testcase = 1
+	A = []int{1, 3, 1, 4, 2, 4, 5, 4}
+	want = 6
+	got = frogRiverOne(5, A)
+	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+
+	testcase = 2 // Leaf falling at where the frog is
+	A = []int{2, 2, 2, 2, 2}
+	want = -1
+	got = frogRiverOne(2, A)
+	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+
+	testcase = 3
+	A = []int{1, 2}
+	want = 1
+	got = frogRiverOne(2, A)
+	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+
+	testcase = 4
+	A = []int{5, 1, 2, 1, 4, 2, 4, 5, 3}
+	want = 8
+	got = frogRiverOne(3, A)
+	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+
+	testcase = 5
+	A = []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 11}
+	want = 11
+	got = frogRiverOne(11, A)
+	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+
+	// in this case, the remaining steps were found after
+	// the position the frog was at.
+	// testcase = 6
+	A = []int{1, 3, 1, 3, 2, 1, 3}
+	want = 4
+	got = frogRiverOne(3, A)
+	fmt.Printf("Test case:%v g:%d w:%d %v \n", testcase, got, want, got == want)
+}
+
+// You are given an array A consisting of N integers
+// representing the falling leaves. A[K] represents the
+// position where one leaf falls at time K, measured in seconds.
+
+// >> The frog can cross only when leaves appear
+// >> at every position across the river from 1 to X.
+
+// X is the position of the frog. Find K.
+
+// Objective: Pass performace tests.
+
+// Another Logic
+// copy the value of A to a new array to preserve the index order
+// sort A
+//
+// check continuous sequence exists to X
+// while checking create a map: This might not be required!
+//
+// if sequence is continuous:
+// 		search the first occuring index of all values till X
+// 		add to map
+//
+// return the highest value of key in the map
+
+// This logic is also complicated. Time and Space contraints are high.
+
+func frogRiverOne(X int, A []int) int {
+	maxIndex := -1
+
+	var magicArr [100000]int
+	lenA := len(A)
+
+	copy(magicArr[:], A)
+	cpA := magicArr[:lenA]
+	sort.Ints(cpA)
+
+	if cpA[0] == cpA[lenA-1] {
+		return maxIndex
+	}
+
+	for k, v := range cpA[:lenA-1] {
+
+		if v > cpA[k+1] {
+			return maxIndex
+		}
+	}
+
+	stepMap := make(map[int]int)
+	for k, v := range A {
+
+		if _, ok := stepMap[v]; !ok && v <= X {
+			stepMap[v] = k
+
+			if maxIndex < k {
+				maxIndex = k
+			}
+		}
+	}
+
+	return maxIndex
+}
+
+// The solution passes all example tests
+// but fails the performance times out with error
+// Detected time complexity: O(N ** 2)
+
+func frogRiverOnePerformaceFail(X int, A []int) int {
+
+	// make a key value pair KVP as key is the value of A, and value is the index
+	// sort A
+	// search X; if X exists return value from KVP(X)
+	// In the above algo; we have to traverse through all the value while making KVP.
+	// So does not sound efficient.
+
+	// Linear O(N) bruteforce solution
+	// Search for X in A
+
+	// Aux map to check if lower steps were exists
+	lowerSteps := make(map[int]bool)
+	step := 1
+	for k, v := range A {
+
+		// Previous logic that fails when lower steps comes after X, Case 6
+		// if lower step exists dont enter in map
+		// if _, ok := lowerSteps[v]; !ok && v <= X {
+		// 	lowerSteps[v] = true
+		// }
+
+		// if X == v {
+		// 	// check if the all the lower steps exists lower than X
+		// 	for step < X {
+
+		// 		if _, ok := lowerSteps[step]; !ok {
+		// 			break
+		// 		}
+		// 		step++
+		// 	}
+
+		// 	// All steps exists
+		// 	if step == X {
+		// 		return k
+		// 	}
+		// }
+
+		// if X exists in the map already,
+		// check if all lower steps exists
+		// if _, ok := lowerSteps[X]; ok {
+
+		// 	for mk := range lowerSteps {
+
+		// 		if _, ok := lowerSteps[step]; ok {
+		// 			// if step == X; return k
+		// 			if step == X {
+		// 				return k
+		// 			}
+		// 			step++
+		// 		}
+		// 	}
+		// }
+
+		// check if map exists in the map
+		// add to map if step does not exist
+		// after addging; check if the all the steps lower than X exists
+		if _, ok := lowerSteps[v]; !ok && v <= X {
+			lowerSteps[v] = true
+
+			for i := 0; i < X; i++ {
+
+				if _, ok := lowerSteps[step]; ok {
+
+					if step == X {
+						return k
+					}
+					step++
+				}
+			}
+		}
+
+	}
+	return -1
+}
+
+// Any integer P, such that 0 < P < N,
+// splits this tape into two non-empty parts:
+// A[0], A[1], ..., A[P − 1] and A[P], A[P + 1], ..., A[N − 1].
+// The difference between the two parts is the value of:
+// |(A[0] + A[1] + ... + A[P − 1]) − (A[P] + A[P + 1] + ... + A[N − 1])|
+
+// In other words, it is the absolute difference between
+//  the sum of the first part and the sum of the second part.
+
+// Any integer P, such that 0 < P < N, splits this tape into two non-empty parts
+// Write a function: func Solution(A []int) int
+// that, given a non-empty array A of N integers,
+// returns the minimal difference that can be achieved.
+//
+func tapeEquilibrium(A []int) int {
+	// first element - sum of remaining
+	// sum of first N elements - remaining
+	// A[0] = 3 ; 3 - 14 = 11
+	// A[1] = 5 ; 3 + 5 - 9 = 1
+	// A[2] = 2 ; 3 + 5 + 2 - 7 = 10 - 7 = 3
+	// A[3] = 4 ; 3 + 5 + 2 + 4 - 3 = 14 - 3 = 11
+	// A[4] = 3
+
+	// difference of minimum numbers
+	// 2, 3, 3, 4, 5; 3 - 2 = 1
+
+	// A[0] = 3
+	// A[1] = 1
+	// A[2] = 2
+	// A[3] = 4
+	// A[4] = 3
+	// 1, 2, 3, 3, 4 = 2 -1 = 1
+
+	// -2, 3, 3, 4, 5; 3 - -2 = 5
+	// -2; -2 + 3, 3, 4, 5 =
+
+	sort.Ints(A)
+
+	return A[1] - A[0]
+
+}
+
 func frogJumpClient() {
 	var want, got int
 
